@@ -28,9 +28,14 @@ import {
   Clock,
   Trash2,
   Zap,
-  HelpCircle
+  HelpCircle,
+  FileClock,
+  PieChart,
+  RefreshCw,
+  Loader2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import GlobalSearch from './GlobalSearch';
 
 const Layout = ({ children }: { children?: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile state
@@ -38,18 +43,20 @@ const Layout = ({ children }: { children?: React.ReactNode }) => {
   const [dashboardOpen, setDashboardOpen] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [reportMessage, setReportMessage] = useState<string | null>(null);
   
   const profileRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
   
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, deductCredits } = useAuth();
 
   // Mock Notifications State
   const [notifications, setNotifications] = useState([
     { id: 1, title: 'GSTR-3B Due Soon', message: 'Your GSTR-3B filing for October is due in 3 days.', time: '2 hours ago', type: 'warning', read: false },
-    { id: 2, title: 'Payment Successful', message: 'Subscription payment of $49 was successful.', time: '1 day ago', type: 'success', read: false },
+    { id: 2, title: 'Payment Successful', message: 'Subscription payment of ₹49 was successful.', time: '1 day ago', type: 'success', read: false },
     { id: 3, title: 'ITC Mismatch Detected', message: 'Mismatch detected for Vendor Global Solutions Ltd.', time: '1 day ago', type: 'error', read: false },
     { id: 4, title: 'New Feature Alert', message: 'Check out the new ITC reconciliation report.', time: '2 days ago', type: 'info', read: true },
     { id: 5, title: 'System Maintenance', message: 'Scheduled maintenance on Sunday 2 AM.', time: '3 days ago', type: 'info', read: true },
@@ -86,6 +93,23 @@ const Layout = ({ children }: { children?: React.ReactNode }) => {
         case 'error': return 'bg-red-50';
         default: return 'bg-blue-50';
     }
+  };
+
+  const handleGenerateReport = () => {
+      if (isGenerating) return;
+
+      const success = deductCredits(1);
+      if (success) {
+          setIsGenerating(true);
+          // Simulate generation
+          setTimeout(() => {
+              setIsGenerating(false);
+              setReportMessage("Report generated successfully!");
+              setTimeout(() => setReportMessage(null), 3000);
+          }, 2000);
+      } else {
+          alert('Insufficient credits! Please refer friends or upgrade to generate more reports.');
+      }
   };
 
   // Close mobile sidebar automatically when route changes
@@ -182,8 +206,8 @@ const Layout = ({ children }: { children?: React.ReactNode }) => {
         {/* Inner Container for fixed width content to avoid squashing during transition */}
         <div className="w-72 flex flex-col h-full">
             <div className="flex items-center justify-between h-20 px-6 border-b border-gray-100 flex-shrink-0">
-            <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
+            <div className="flex items-center space-x-3 group cursor-pointer">
+                <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200 group-hover:rotate-12 transition-transform duration-300 ease-in-out">
                 <Hexagon className="w-6 h-6 text-white" strokeWidth={2.5} />
                 </div>
                 <div className={`${!desktopSidebarOpen && 'lg:hidden'} transition-opacity duration-200`}>
@@ -201,7 +225,7 @@ const Layout = ({ children }: { children?: React.ReactNode }) => {
             </button>
             </div>
             
-            <div className="flex-1 overflow-y-auto px-4 py-6 space-y-1 scrollbar-hide">
+            <div className="flex-1 overflow-y-auto px-4 py-6 space-y-1 scrollbar-hide" id="sidebar-nav">
             {user?.role === 'user' && (
                 <>
                 {/* Dashboard Group */}
@@ -235,8 +259,10 @@ const Layout = ({ children }: { children?: React.ReactNode }) => {
                 <div className="px-4 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                     Admin Controls
                 </div>
+                <NavItem to="/admin/overview" icon={PieChart} label="Dashboard" />
                 <NavItem to="/admin/customers" icon={Users} label="Customers" />
                 <NavItem to="/admin/subscriptions" icon={CreditCard} label="Subscriptions" />
+                <NavItem to="/admin/logs" icon={FileClock} label="System Logs" />
                 <NavItem to="/support" icon={HelpCircle} label="Support Tickets" />
                 </>
             )}
@@ -260,41 +286,73 @@ const Layout = ({ children }: { children?: React.ReactNode }) => {
         <header className="flex items-center justify-between h-20 px-6 bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm lg:shadow-none">
           <div className="flex items-center gap-4">
             <button 
-                className="p-2 -ml-2 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors" 
+                className={`p-2 -ml-2 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors ${desktopSidebarOpen ? 'lg:hidden' : ''}`} 
                 onClick={toggleSidebar}
                 aria-label="Toggle Sidebar"
             >
-                {!desktopSidebarOpen && window.innerWidth >= 1024 ? <PanelLeft className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                <Menu className="w-6 h-6 lg:hidden" />
+                <PanelLeft className="w-6 h-6 hidden lg:block" />
             </button>
             
             {/* Mobile Logo */}
-            <div className="flex lg:hidden items-center space-x-2">
-                <Hexagon className="w-6 h-6 text-indigo-600" strokeWidth={2.5} />
+            <div className="flex lg:hidden items-center space-x-2 group cursor-pointer">
+                <Hexagon className="w-6 h-6 text-indigo-600 group-hover:rotate-12 transition-transform duration-300 ease-in-out" strokeWidth={2.5} />
                 <span className="font-bold text-gray-900">Pinnacle</span>
             </div>
 
-            {/* Desktop Search Bar */}
-            <div className="hidden lg:flex items-center relative w-64">
-                <Search className="w-4 h-4 text-gray-400 absolute left-3" />
-                <input 
-                  type="text" 
-                  placeholder="Search..." 
-                  className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
-                />
+            {/* Global Search */}
+            <div className="hidden lg:block" id="global-search-container">
+               <GlobalSearch />
             </div>
           </div>
           
           {/* Top Right User Profile Section */}
           <div className="flex items-center space-x-3 md:space-x-6">
             
+            {/* Generate Report Button - Consumes Credits */}
+            {user?.role === 'user' && user.connectedGSTINs && user.connectedGSTINs.length > 0 && (
+                <div className="hidden md:block">
+                    <button 
+                        onClick={handleGenerateReport}
+                        disabled={isGenerating}
+                        className={`
+                            flex items-center px-4 py-2 rounded-lg text-sm font-bold text-white shadow-md transition-all
+                            ${isGenerating ? 'bg-indigo-400 cursor-wait' : 'bg-indigo-600 hover:bg-indigo-700 hover:scale-[1.02] active:scale-[0.98]'}
+                        `}
+                    >
+                        {isGenerating ? (
+                            <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Generating...
+                            </>
+                        ) : reportMessage ? (
+                             <>
+                                <Check className="w-4 h-4 mr-2" />
+                                {reportMessage}
+                             </>
+                        ) : (
+                            <>
+                                <RefreshCw className="w-4 h-4 mr-2" />
+                                Generate Report (1 Credit)
+                            </>
+                        )}
+                    </button>
+                </div>
+            )}
+
             {/* Credits Display */}
-            <div className="hidden md:flex items-center bg-indigo-50 border border-indigo-100 px-3 py-1.5 rounded-full cursor-help group relative" title="Your Credit Balance">
+            <div id="credits-display" className="hidden md:flex items-center bg-indigo-50 border border-indigo-100 px-3 py-1.5 rounded-full cursor-help group relative" title="Your Credit Balance">
                 <Zap className="w-4 h-4 text-indigo-600 mr-2 fill-indigo-600" />
-                <span className="text-sm font-bold text-indigo-900">{user?.credits || 0} Credits</span>
+                <span className="text-sm font-bold text-indigo-900">
+                    {user?.role === 'admin' ? 'Unlimited' : `${user?.credits || 0} Credits`}
+                </span>
                 
                 {/* Tooltip for credits */}
                 <div className="absolute top-full mt-2 right-0 w-48 bg-gray-900 text-white text-xs rounded-lg py-2 px-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                    Use credits for advanced reports and AI analysis.
+                    {user?.role === 'admin' 
+                        ? 'You have unlimited credits as an administrator.'
+                        : 'Use credits for advanced reports and AI analysis.'
+                    }
                 </div>
             </div>
 
@@ -405,7 +463,9 @@ const Layout = ({ children }: { children?: React.ReactNode }) => {
                                     <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
                                     <div className="flex items-center mt-0.5">
                                         <Zap className="w-3 h-3 text-indigo-500 mr-1 fill-indigo-500" />
-                                        <p className="text-xs text-gray-600 font-medium">{user?.credits} Credits</p>
+                                        <p className="text-xs text-gray-600 font-medium">
+                                            {user?.role === 'admin' ? 'Unlimited' : `${user?.credits} Credits`}
+                                        </p>
                                     </div>
                                 </div>
                            </div>

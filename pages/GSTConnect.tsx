@@ -1,20 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import UpgradeModal from '../components/UpgradeModal';
 import { Plus, Trash2, Building2, CheckCircle, Lock } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export const GSTConnect = () => {
-  const { user } = useAuth();
+  const { user, connectGSTIN } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [username, setUsername] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [upgradeFeature, setUpgradeFeature] = useState('');
 
-  // Mock Connected GSTINs based on user profile for demo
-  const [connectedGSTINs, setConnectedGSTINs] = useState([
-      { id: 1, gstin: '27AABCU9603R1ZN', name: user?.companyName || 'Primary Business' }
-  ]);
+  // Prefill from Overview redirect
+  useEffect(() => {
+      if (location.state?.prefillGSTIN) {
+          setUsername(location.state.prefillGSTIN);
+          // Auto scroll to form
+          setTimeout(() => {
+             document.getElementById('connect-form')?.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+      }
+  }, [location]);
+
+  const connectedGSTINs = user?.connectedGSTINs || [];
 
   const maxGSTINs = user?.userType === 'Individual' ? 1 : user?.userType === 'Business' ? 5 : 999;
   const isLimitReached = connectedGSTINs.length >= maxGSTINs;
@@ -25,7 +36,8 @@ export const GSTConnect = () => {
           setShowUpgrade(true);
       } else {
           setStep(1);
-          // Scroll to form
+          setUsername('');
+          setOtp(['','','','','','']);
           document.getElementById('connect-form')?.scrollIntoView({ behavior: 'smooth' });
       }
   };
@@ -45,13 +57,14 @@ export const GSTConnect = () => {
   };
 
   const handleVerify = () => {
-     // Mock successful connection
-     const newGSTIN = { id: Date.now(), gstin: '27ABCDE1234F1Z5', name: username || 'New Business' };
-     setConnectedGSTINs([...connectedGSTINs, newGSTIN]);
-     alert('GSTIN Connected Successfully!');
-     setStep(1);
-     setUsername('');
-     setOtp(['','','','','','']);
+     // Save to global context
+     const name = username.length === 15 ? 'Primary Business' : username; // Heuristic for name
+     connectGSTIN(username, name);
+     
+     alert('GSTIN Connected Successfully! Redirecting to Dashboard...');
+     setTimeout(() => {
+         navigate('/dashboard/overview');
+     }, 1000);
   };
 
   return (
@@ -78,7 +91,8 @@ export const GSTConnect = () => {
                )}
            </div>
            <div className="divide-y divide-gray-100">
-               {connectedGSTINs.map((item) => (
+               {connectedGSTINs.length > 0 ? (
+                   connectedGSTINs.map((item) => (
                    <div key={item.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
                        <div className="flex items-center gap-4">
                            <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600">
@@ -98,7 +112,11 @@ export const GSTConnect = () => {
                            </button>
                        </div>
                    </div>
-               ))}
+               ))) : (
+                    <div className="p-8 text-center text-gray-500 text-sm">
+                        No GSTINs connected yet. Connect one below to get started.
+                    </div>
+               )}
                
                {/* Add New Button */}
                <div className="p-4 bg-gray-50/50">
@@ -133,17 +151,17 @@ export const GSTConnect = () => {
                  <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 w-full max-w-lg relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
                     <h2 className="text-xl font-bold text-gray-900 mb-2">New Connection</h2>
-                    <p className="text-sm text-gray-500 mb-6">Enter your GST Portal Username to send an OTP and establish a secure connection.</p>
+                    <p className="text-sm text-gray-500 mb-6">Enter your GST Portal Username or GSTIN to send an OTP and establish a secure connection.</p>
                     
                     <div className="space-y-4">
                        <div>
-                         <label className="block text-sm font-medium text-gray-700 mb-1">GST Portal Username</label>
+                         <label className="block text-sm font-medium text-gray-700 mb-1">GST Username / GSTIN</label>
                          <input 
                             type="text"
                             value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            placeholder="e.g. GSTUSER123"
-                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all bg-white text-gray-900"
+                            onChange={(e) => setUsername(e.target.value.toUpperCase())}
+                            placeholder="e.g. 27ABCDE1234F1Z5"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all bg-white text-gray-900 uppercase"
                          />
                        </div>
                        <button 

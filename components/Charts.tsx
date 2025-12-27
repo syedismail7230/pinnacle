@@ -17,32 +17,48 @@ import {
   Cell
 } from 'recharts';
 
-const CommonGrid = () => <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />;
-const CommonXAxis = ({ dataKey = "name" }) => <XAxis dataKey={dataKey} axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12}} dy={10} />;
-const CommonYAxis = () => <YAxis axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12}} />;
-const CommonTooltip = () => <Tooltip cursor={{fill: 'transparent'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}} />;
-const CommonLegend = () => <Legend iconType="circle" wrapperStyle={{paddingTop: '20px'}} />;
+const commonAxisProps = {
+    axisLine: false,
+    tickLine: false,
+    tick: { fill: '#6b7280', fontSize: 12 }
+};
+
+const commonTooltipProps = {
+    cursor: { fill: 'transparent' },
+    contentStyle: { borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }
+};
+
+const commonLegendProps = {
+    iconType: "circle" as const,
+    wrapperStyle: { paddingTop: '20px' }
+};
+
+const commonGridProps = {
+    strokeDasharray: "3 3",
+    vertical: false,
+    stroke: "#e5e7eb"
+};
 
 export const FinancialChart = ({ data, type = 'bar' }: { data: any[], type?: 'bar' | 'line' | 'area' }) => {
   return (
     <ResponsiveContainer width="100%" height={300}>
       {type === 'bar' ? (
         <BarChart data={data} barSize={20}>
-          <CommonGrid />
-          <CommonXAxis />
-          <CommonYAxis />
-          <CommonTooltip />
-          <CommonLegend />
+          <CartesianGrid {...commonGridProps} />
+          <XAxis dataKey="name" {...commonAxisProps} dy={10} />
+          <YAxis {...commonAxisProps} />
+          <Tooltip {...commonTooltipProps} />
+          <Legend {...commonLegendProps} />
           <Bar dataKey="income" name="Income" fill="#6366f1" radius={[4, 4, 0, 0]} />
           <Bar dataKey="expense" name="Expense" fill="#ec4899" radius={[4, 4, 0, 0]} />
         </BarChart>
       ) : type === 'line' ? (
         <LineChart data={data}>
-          <CommonGrid />
-          <CommonXAxis />
-          <CommonYAxis />
-          <CommonTooltip />
-          <CommonLegend />
+          <CartesianGrid {...commonGridProps} />
+          <XAxis dataKey="name" {...commonAxisProps} dy={10} />
+          <YAxis {...commonAxisProps} />
+          <Tooltip {...commonTooltipProps} />
+          <Legend {...commonLegendProps} />
           <Line type="monotone" dataKey="income" name="Income" stroke="#6366f1" strokeWidth={2} dot={false} />
           <Line type="monotone" dataKey="expense" name="Expense" stroke="#ec4899" strokeWidth={2} dot={false} />
         </LineChart>
@@ -58,11 +74,11 @@ export const FinancialChart = ({ data, type = 'bar' }: { data: any[], type?: 'ba
               <stop offset="95%" stopColor="#ec4899" stopOpacity={0}/>
             </linearGradient>
           </defs>
-          <CommonGrid />
-          <CommonXAxis />
-          <CommonYAxis />
-          <CommonTooltip />
-          <CommonLegend />
+          <CartesianGrid {...commonGridProps} />
+          <XAxis dataKey="name" {...commonAxisProps} dy={10} />
+          <YAxis {...commonAxisProps} />
+          <Tooltip {...commonTooltipProps} />
+          <Legend {...commonLegendProps} />
           <Area type="monotone" dataKey="income" name="Income" stroke="#6366f1" fillOpacity={1} fill="url(#colorIncome)" />
           <Area type="monotone" dataKey="expense" name="Expense" stroke="#ec4899" fillOpacity={1} fill="url(#colorExpense)" />
         </AreaChart>
@@ -76,21 +92,21 @@ export const LiabilityChart = ({ data, type = 'line' }: { data: any[], type?: 'b
     <ResponsiveContainer width="100%" height={300}>
       {type === 'bar' ? (
         <BarChart data={data} barSize={20}>
-          <CommonGrid />
-          <CommonXAxis />
-          <CommonYAxis />
-          <CommonTooltip />
-          <CommonLegend />
+          <CartesianGrid {...commonGridProps} />
+          <XAxis dataKey="name" {...commonAxisProps} dy={10} />
+          <YAxis {...commonAxisProps} />
+          <Tooltip {...commonTooltipProps} />
+          <Legend {...commonLegendProps} />
           <Bar dataKey="liability" name="Tax Liability" fill="#ef4444" radius={[4, 4, 0, 0]} />
           <Bar dataKey="itc" name="ITC Claimed" fill="#f59e0b" radius={[4, 4, 0, 0]} />
         </BarChart>
       ) : type === 'line' ? (
         <LineChart data={data}>
-          <CommonGrid />
-          <CommonXAxis />
-          <CommonYAxis />
-          <CommonTooltip />
-          <CommonLegend />
+          <CartesianGrid {...commonGridProps} />
+          <XAxis dataKey="name" {...commonAxisProps} dy={10} />
+          <YAxis {...commonAxisProps} />
+          <Tooltip {...commonTooltipProps} />
+          <Legend {...commonLegendProps} />
           <Line type="monotone" dataKey="liability" name="Tax Liability" stroke="#ef4444" strokeWidth={2} dot={false} />
           <Line type="monotone" dataKey="itc" name="ITC Claimed" stroke="#f59e0b" strokeWidth={2} dot={false} />
         </LineChart>
@@ -106,11 +122,11 @@ export const LiabilityChart = ({ data, type = 'line' }: { data: any[], type?: 'b
               <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
             </linearGradient>
           </defs>
-          <CommonGrid />
-          <CommonXAxis />
-          <CommonYAxis />
-          <CommonTooltip />
-          <CommonLegend />
+          <CartesianGrid {...commonGridProps} />
+          <XAxis dataKey="name" {...commonAxisProps} dy={10} />
+          <YAxis {...commonAxisProps} />
+          <Tooltip {...commonTooltipProps} />
+          <Legend {...commonLegendProps} />
           <Area type="monotone" dataKey="liability" name="Tax Liability" stroke="#ef4444" fillOpacity={1} fill="url(#colorLiab)" />
           <Area type="monotone" dataKey="itc" name="ITC Claimed" stroke="#f59e0b" fillOpacity={1} fill="url(#colorItc)" />
         </AreaChart>
@@ -124,20 +140,20 @@ export const SalesAnalysisChart = ({ data, type = 'area' }: { data: any[], type?
     <ResponsiveContainer width="100%" height={350}>
       {type === 'bar' ? (
          <BarChart data={data} barSize={20}>
-            <CommonGrid />
-            <CommonXAxis />
-            <CommonYAxis />
-            <CommonTooltip />
-            <CommonLegend />
+            <CartesianGrid {...commonGridProps} />
+            <XAxis dataKey="name" {...commonAxisProps} dy={10} />
+            <YAxis {...commonAxisProps} />
+            <Tooltip {...commonTooltipProps} />
+            <Legend {...commonLegendProps} />
             <Bar dataKey="value" name="Total Sales" fill="#6366f1" radius={[4, 4, 0, 0]} />
          </BarChart>
       ) : type === 'line' ? (
          <LineChart data={data}>
-            <CommonGrid />
-            <CommonXAxis />
-            <CommonYAxis />
-            <CommonTooltip />
-            <CommonLegend />
+            <CartesianGrid {...commonGridProps} />
+            <XAxis dataKey="name" {...commonAxisProps} dy={10} />
+            <YAxis {...commonAxisProps} />
+            <Tooltip {...commonTooltipProps} />
+            <Legend {...commonLegendProps} />
             <Line type="monotone" dataKey="value" name="Total Sales" stroke="#6366f1" strokeWidth={2} dot={false} />
          </LineChart>
       ) : (
@@ -148,10 +164,10 @@ export const SalesAnalysisChart = ({ data, type = 'area' }: { data: any[], type?
               <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
             </linearGradient>
           </defs>
-          <CommonGrid />
-          <CommonXAxis />
-          <CommonYAxis />
-          <CommonTooltip />
+          <CartesianGrid {...commonGridProps} />
+          <XAxis dataKey="name" {...commonAxisProps} dy={10} />
+          <YAxis {...commonAxisProps} />
+          <Tooltip {...commonTooltipProps} />
           <Area 
             type="monotone" 
             dataKey="value" 
@@ -161,7 +177,7 @@ export const SalesAnalysisChart = ({ data, type = 'area' }: { data: any[], type?
             fillOpacity={1} 
             fill="url(#colorSales)" 
           />
-          <CommonLegend />
+          <Legend {...commonLegendProps} />
         </AreaChart>
       )}
     </ResponsiveContainer>
@@ -182,7 +198,7 @@ export const ITCAnalysisChart = ({ type = 'pie' }: { type?: 'pie' | 'donut' | 'b
             <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#e5e7eb" />
             <XAxis type="number" hide />
             <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fill: '#4b5563', fontSize: 12}} />
-            <Tooltip cursor={{fill: 'transparent'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}} />
+            <Tooltip {...commonTooltipProps} />
             <Bar dataKey="value" barSize={30} radius={[0, 4, 4, 0]}>
                 {data.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
@@ -204,7 +220,7 @@ export const ITCAnalysisChart = ({ type = 'pie' }: { type?: 'pie' | 'donut' | 'b
                 <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
             </Pie>
-            <Tooltip />
+            <Tooltip {...commonTooltipProps} />
             <Legend verticalAlign="bottom" height={36}/>
         </PieChart>
       )}

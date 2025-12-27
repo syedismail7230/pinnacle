@@ -1,10 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FinancialChart, LiabilityChart } from '../components/Charts';
 import { CHART_DATA_OVERVIEW, CHART_DATA_LINE } from '../constants';
-import { TrendingUp, TrendingDown, IndianRupee, Wallet, PieChart, AlertCircle, Calendar, Clock, ChevronRight, ChevronDown, BarChart3, LineChart, Activity, Lock } from 'lucide-react';
+import { TrendingUp, TrendingDown, IndianRupee, Wallet, PieChart, AlertCircle, Calendar, Clock, ChevronRight, ChevronDown, BarChart3, LineChart, Activity, Lock, Check, FileText, Building2, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import UpgradeModal from '../components/UpgradeModal';
+
+const GSTPromptModal = ({ isOpen, onSubmit }: { isOpen: boolean; onSubmit: (gstin: string) => void }) => {
+    const [gstin, setGstin] = useState('');
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+            <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl p-8 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
+                
+                <div className="text-center mb-6">
+                    <div className="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Building2 className="w-7 h-7 text-indigo-600" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Connect Your Business</h2>
+                    <p className="text-gray-500 text-sm">To generate reports and view analytics, please enter your GST Identification Number.</p>
+                </div>
+
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5 ml-1">Enter GST Number</label>
+                        <input 
+                            type="text" 
+                            value={gstin}
+                            onChange={(e) => setGstin(e.target.value.toUpperCase())}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-xl text-lg font-mono placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all uppercase"
+                            placeholder="27ABCDE1234F1Z5"
+                            maxLength={15}
+                        />
+                    </div>
+                    <button 
+                        onClick={() => onSubmit(gstin)}
+                        disabled={gstin.length < 15}
+                        className="w-full py-3.5 bg-indigo-600 text-white rounded-xl font-bold text-sm hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Proceed to Connection <ArrowRight className="ml-2 w-4 h-4" />
+                    </button>
+                    <p className="text-xs text-center text-gray-400">Secure connection via GSTN API</p>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const StatCard = ({ title, value, change, isPositive, icon: Icon, color, onClick }: any) => (
   <div 
@@ -66,6 +110,23 @@ const Overview = () => {
   // Upgrade Modal State
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [lockedFeature, setLockedFeature] = useState('');
+  
+  // GST Prompt State
+  const [showGSTPrompt, setShowGSTPrompt] = useState(false);
+
+  useEffect(() => {
+    // Check if user has connected GSTINs
+    if (user && user.role === 'user' && (!user.connectedGSTINs || user.connectedGSTINs.length === 0)) {
+        setShowGSTPrompt(true);
+    } else {
+        setShowGSTPrompt(false);
+    }
+  }, [user]);
+
+  const handleGSTSubmit = (gstin: string) => {
+      // Redirect to connection page with state
+      navigate('/gst-connection', { state: { prefillGSTIN: gstin } });
+  };
 
   // Lock specific advanced charts for 'Individual' users
   const isIndividual = user?.userType === 'Individual';
@@ -83,10 +144,20 @@ const Overview = () => {
         featureName={lockedFeature} 
       />
 
+      <GSTPromptModal 
+        isOpen={showGSTPrompt} 
+        onSubmit={handleGSTSubmit} 
+      />
+
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
-            <p className="text-sm text-gray-500">Welcome back, {user?.name || 'User'} ({user?.userType})</p>
+            <p className="text-sm text-gray-500">
+                {user?.connectedGSTINs && user.connectedGSTINs.length > 0 
+                 ? `Showing data for ${user.connectedGSTINs[0].gstin}`
+                 : `Welcome back, ${user?.name || 'User'}`
+                }
+            </p>
           </div>
           
           <div className="relative w-full sm:w-auto group">
@@ -147,7 +218,7 @@ const Overview = () => {
       </div>
 
       {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" id="overview-charts-section">
         <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm relative overflow-hidden">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
               <h2 className="text-lg font-bold text-gray-900 flex items-center">
@@ -198,31 +269,62 @@ const Overview = () => {
 
       {/* Bottom Lists Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Filing Status */}
-        <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-gray-900">Upcoming Filings</h2>
-            <button onClick={() => navigate('/dashboard/compliance')} className="text-sm text-indigo-600 hover:text-indigo-700 font-medium">Manage</button>
-          </div>
-          <div className="space-y-4">
-            {[
-              { type: 'GSTR-3B (May 2024)', date: 'Jul 20, 2024', status: 'Due', color: 'bg-amber-100 text-amber-700' },
-              { type: 'GSTR-1 (May 2024)', date: 'Jun 11, 2024', status: 'Filed', color: 'bg-emerald-100 text-emerald-700' },
-              { type: 'GSTR-9 (FY 2023-24)', date: 'Dec 31, 2024', status: 'Due', color: 'bg-amber-100 text-amber-700' },
-              { type: 'GSTR-3B (Apr 2024)', date: 'May 20, 2024', status: 'Filed', color: 'bg-emerald-100 text-emerald-700' },
-              { type: 'GSTR-1 (Apr 2024)', date: 'May 11, 2024', status: 'Filed', color: 'bg-emerald-100 text-emerald-700' },
-            ].map((item, i) => (
-              <div key={i} className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0 hover:bg-gray-50 px-2 rounded-lg transition-colors cursor-default">
-                <div className="flex flex-col">
-                   <span className="font-semibold text-gray-800 text-sm">{item.type}</span>
-                   <span className="text-xs text-gray-400 mt-0.5">Due: {item.date}</span>
+        {/* Monthly Filing Status */}
+        <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col">
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                    <h2 className="text-lg font-bold text-gray-900">Monthly Filing Status</h2>
                 </div>
-                <span className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wide ${item.color}`}>
-                  {item.status}
-                </span>
-              </div>
-            ))}
-          </div>
+                <button onClick={() => navigate('/dashboard/compliance')} className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center">
+                    Full History <ChevronRight className="w-4 h-4 ml-0.5" />
+                </button>
+            </div>
+            
+            <div className="flex-1 overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                    <thead className="text-xs text-gray-500 uppercase bg-gray-50/50">
+                        <tr>
+                            <th className="px-4 py-3 font-semibold rounded-l-lg">Period</th>
+                            <th className="px-4 py-3 font-semibold">GSTR-1</th>
+                            <th className="px-4 py-3 font-semibold rounded-r-lg">GSTR-3B</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                        {[
+                            { month: 'Nov 2024', gstr1: 'Filed', gstr1Date: '11 Dec', gstr3b: 'Pending', gstr3bDate: 'Due 20 Dec' },
+                            { month: 'Oct 2024', gstr1: 'Filed', gstr1Date: '11 Nov', gstr3b: 'Filed', gstr3bDate: '20 Nov' },
+                            { month: 'Sep 2024', gstr1: 'Filed', gstr1Date: '11 Oct', gstr3b: 'Filed', gstr3bDate: '20 Oct' },
+                            { month: 'Aug 2024', gstr1: 'Filed', gstr1Date: '11 Sep', gstr3b: 'Filed', gstr3bDate: '20 Sep' },
+                        ].map((row, idx) => (
+                            <tr key={idx} className="hover:bg-gray-50 transition-colors group">
+                                <td className="px-4 py-4 font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">{row.month}</td>
+                                <td className="px-4 py-4">
+                                    <div className="flex items-center">
+                                        <div className={`mr-3 p-1.5 rounded-full flex-shrink-0 ${row.gstr1 === 'Filed' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}`}>
+                                            {row.gstr1 === 'Filed' ? <Check className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className={`text-xs font-bold ${row.gstr1 === 'Filed' ? 'text-emerald-700' : 'text-amber-700'}`}>{row.gstr1}</span>
+                                            <span className="text-xs text-gray-400 font-medium">{row.gstr1Date}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className="px-4 py-4">
+                                    <div className="flex items-center">
+                                        <div className={`mr-3 p-1.5 rounded-full flex-shrink-0 ${row.gstr3b === 'Filed' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}`}>
+                                            {row.gstr3b === 'Filed' ? <Check className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className={`text-xs font-bold ${row.gstr3b === 'Filed' ? 'text-emerald-700' : 'text-amber-700'}`}>{row.gstr3b}</span>
+                                            <span className="text-xs text-gray-400 font-medium">{row.gstr3bDate}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         {/* Noticed Issues */}

@@ -1,20 +1,20 @@
 import { Users, FileText, CreditCard, PieChart, Activity, Link, Settings, Download, LayoutDashboard, BarChart3, AlertCircle } from 'lucide-react';
 
 export const MOCK_CUSTOMERS = [
-  { id: '1', name: 'Sarah Chen', avatar: 'https://picsum.photos/32/32?random=1', subscription: 'Active', totalSpend: '$1,250.75', lastActive: '2 days ago', joined: 'Jan 15, 2023' },
-  { id: '2', name: 'Michael Brown', avatar: 'https://picsum.photos/32/32?random=2', subscription: 'Trial', totalSpend: '$0.00', lastActive: '5 hours ago', joined: 'Oct 28, 2023' },
-  { id: '3', name: 'Fatima Khan', avatar: 'https://picsum.photos/32/32?random=3', subscription: 'Inactive', totalSpend: '$450.00', lastActive: '1 month ago', joined: 'Mar 01, 2022' },
-  { id: '4', name: 'David Lee', avatar: 'https://picsum.photos/32/32?random=4', subscription: 'Active', totalSpend: '$3,200.50', lastActive: '1 hour ago', joined: 'Aug 20, 2021' },
-  { id: '5', name: 'Maria Garcia', avatar: 'https://picsum.photos/32/32?random=5', subscription: 'Active', totalSpend: '$780.20', lastActive: '6 days ago', joined: 'Nov 10, 2023' },
+  { id: '1', name: 'Sarah Chen', avatar: 'https://picsum.photos/32/32?random=1', subscription: 'Active', totalSpend: '₹1,250.75', lastActive: '2 days ago', joined: 'Jan 15, 2023' },
+  { id: '2', name: 'Michael Brown', avatar: 'https://picsum.photos/32/32?random=2', subscription: 'Trial', totalSpend: '₹0.00', lastActive: '5 hours ago', joined: 'Oct 28, 2023' },
+  { id: '3', name: 'Fatima Khan', avatar: 'https://picsum.photos/32/32?random=3', subscription: 'Inactive', totalSpend: '₹450.00', lastActive: '1 month ago', joined: 'Mar 01, 2022' },
+  { id: '4', name: 'David Lee', avatar: 'https://picsum.photos/32/32?random=4', subscription: 'Active', totalSpend: '₹3,200.50', lastActive: '1 hour ago', joined: 'Aug 20, 2021' },
+  { id: '5', name: 'Maria Garcia', avatar: 'https://picsum.photos/32/32?random=5', subscription: 'Active', totalSpend: '₹780.20', lastActive: '6 days ago', joined: 'Nov 10, 2023' },
 ];
 
 export const MOCK_SUBSCRIPTIONS = [
-  { id: '1', customerName: 'Acme Corp', email: 'acme@example.com', plan: 'Enterprise', status: 'Active', startDate: '2023-01-01', endDate: '2024-01-01', monthlyPrice: '$99.99' },
-  { id: '2', customerName: 'Globex Inc.', email: 'globex@example.com', plan: 'Pro', status: 'Pending', startDate: '2023-02-15', endDate: '2024-02-15', monthlyPrice: '$49.99' },
-  { id: '3', customerName: 'Soylent Corp', email: 'soylent@example.com', plan: 'Basic', status: 'Cancelled', startDate: '2023-03-01', endDate: '2023-09-01', monthlyPrice: '$19.99' },
-  { id: '4', customerName: 'Initech LLC', email: 'initech@example.com', plan: 'Pro', status: 'Active', startDate: '2023-04-20', endDate: '2024-04-20', monthlyPrice: '$49.99' },
-  { id: '5', customerName: 'Umbrella Corp', email: 'umbrella@example.com', plan: 'Enterprise', status: 'Suspended', startDate: '2023-05-10', endDate: '2024-05-10', monthlyPrice: '$99.99' },
-  { id: '6', customerName: 'Weyland-Yutani', email: 'weyland@example.com', plan: 'Basic', status: 'Active', startDate: '2023-06-01', endDate: '2024-06-01', monthlyPrice: '$19.99' },
+  { id: '1', customerName: 'Acme Corp', email: 'acme@example.com', plan: 'Enterprise', status: 'Active', startDate: '2023-01-01', endDate: '2024-01-01', monthlyPrice: '₹99.99' },
+  { id: '2', customerName: 'Globex Inc.', email: 'globex@example.com', plan: 'Pro', status: 'Pending', startDate: '2023-02-15', endDate: '2024-02-15', monthlyPrice: '₹49.99' },
+  { id: '3', customerName: 'Soylent Corp', email: 'soylent@example.com', plan: 'Basic', status: 'Cancelled', startDate: '2023-03-01', endDate: '2023-09-01', monthlyPrice: '₹19.99' },
+  { id: '4', customerName: 'Initech LLC', email: 'initech@example.com', plan: 'Pro', status: 'Active', startDate: '2023-04-20', endDate: '2024-04-20', monthlyPrice: '₹49.99' },
+  { id: '5', customerName: 'Umbrella Corp', email: 'umbrella@example.com', plan: 'Enterprise', status: 'Suspended', startDate: '2023-05-10', endDate: '2024-05-10', monthlyPrice: '₹99.99' },
+  { id: '6', customerName: 'Weyland-Yutani', email: 'weyland@example.com', plan: 'Basic', status: 'Active', startDate: '2023-06-01', endDate: '2024-06-01', monthlyPrice: '₹19.99' },
 ];
 
 export const MOCK_SALES_TRANSACTIONS = [

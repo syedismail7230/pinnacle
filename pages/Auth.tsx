@@ -36,7 +36,7 @@ export const Login = () => {
       <div className="w-full max-w-xl">
         <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
             <div className="p-8 pb-0 flex flex-col items-center">
-                <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200 transform -rotate-6 mb-4">
+                <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200 transform -rotate-6 hover:rotate-6 transition-transform duration-300 ease-in-out mb-4 cursor-pointer">
                     <Hexagon className="w-8 h-8 text-white" strokeWidth={2.5} />
                 </div>
                 <h1 className="text-2xl font-bold text-gray-900 mb-1">Pinnacle Analytics</h1>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Phone, MessageSquare, ChevronDown, ChevronUp, Send, Lock } from 'lucide-react';
+import { Mail, Phone, MessageSquare, ChevronDown, ChevronUp, Send, Lock, User, CheckCircle, Clock, AlertCircle, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import UpgradeModal from '../components/UpgradeModal';
 
@@ -23,6 +23,153 @@ const FAQItem = ({ question, answer }: { question: string, answer: string }) => 
     );
 };
 
+// Mock Tickets
+const MOCK_TICKETS = [
+    { id: 'TCK-1023', user: 'Sarah Chen', email: 'sarah@example.com', subject: 'Billing Issue', message: 'I was charged twice for this month subscription.', status: 'Open', date: '2 hours ago', priority: 'High' },
+    { id: 'TCK-1022', user: 'Michael Brown', email: 'mike@example.com', subject: 'GSTR-3B Mismatch', message: 'The ITC numbers in the dashboard do not match my 2A.', status: 'Pending', date: '1 day ago', priority: 'Medium' },
+    { id: 'TCK-1021', user: 'David Lee', email: 'david@example.com', subject: 'Feature Request', message: 'Can you add CSV export for compliance reports?', status: 'Closed', date: '3 days ago', priority: 'Low' },
+    { id: 'TCK-1020', user: 'Fatima Khan', email: 'fatima@example.com', subject: 'Login Trouble', message: 'I cannot reset my password via OTP.', status: 'Closed', date: '5 days ago', priority: 'High' },
+];
+
+const TicketResolveModal = ({ isOpen, onClose, ticket, onResolve }: any) => {
+    const [reply, setReply] = useState('');
+    
+    if (!isOpen || !ticket) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl p-0 overflow-hidden">
+                 <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                    <h3 className="text-lg font-bold text-gray-900">Resolve Ticket: {ticket.id}</h3>
+                    <button onClick={onClose}><X className="w-5 h-5 text-gray-500 hover:text-gray-700" /></button>
+                </div>
+                <div className="p-6">
+                    <div className="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-100">
+                        <p className="text-xs text-gray-500 mb-1">User Inquiry:</p>
+                        <p className="text-sm text-gray-800 italic">"{ticket.message}"</p>
+                    </div>
+
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Admin Response</label>
+                    <textarea 
+                        className="w-full h-32 p-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none resize-none mb-4"
+                        placeholder="Type your reply to the user..."
+                        value={reply}
+                        onChange={(e) => setReply(e.target.value)}
+                    ></textarea>
+
+                    <div className="flex gap-3">
+                         <button 
+                            onClick={() => { onResolve(ticket.id, 'Pending'); onClose(); }}
+                            className="flex-1 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-bold text-sm hover:bg-gray-50 transition-colors"
+                        >
+                            Mark Pending
+                        </button>
+                        <button 
+                            onClick={() => { onResolve(ticket.id, 'Closed'); onClose(); }}
+                            className="flex-1 py-2 bg-indigo-600 text-white rounded-lg font-bold text-sm hover:bg-indigo-700 transition-colors flex items-center justify-center"
+                        >
+                            Send & Close Ticket <Send className="w-3 h-3 ml-2" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const AdminTicketView = () => {
+    const [tickets, setTickets] = useState(MOCK_TICKETS);
+    const [selectedTicket, setSelectedTicket] = useState<any>(null);
+
+    const handleResolve = (id: string, newStatus: string) => {
+        setTickets(tickets.map(t => t.id === id ? { ...t, status: newStatus } : t));
+    };
+
+    return (
+        <div className="space-y-6">
+             <TicketResolveModal 
+                isOpen={!!selectedTicket} 
+                onClose={() => setSelectedTicket(null)} 
+                ticket={selectedTicket}
+                onResolve={handleResolve}
+            />
+
+             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+                    <h2 className="text-lg font-bold text-gray-900 flex items-center">
+                        <MessageSquare className="w-5 h-5 mr-2 text-indigo-600" />
+                        Support Ticket Queue
+                    </h2>
+                    <div className="flex space-x-2">
+                        <span className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-bold">{tickets.length} Total</span>
+                        <span className="px-3 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-bold">{tickets.filter(t => t.status === 'Open').length} Open</span>
+                    </div>
+                </div>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left">
+                        <thead className="text-xs text-gray-500 uppercase bg-gray-50/50">
+                            <tr>
+                                <th className="px-6 py-4 font-semibold">Ticket ID</th>
+                                <th className="px-6 py-4 font-semibold">User</th>
+                                <th className="px-6 py-4 font-semibold">Subject</th>
+                                <th className="px-6 py-4 font-semibold">Status</th>
+                                <th className="px-6 py-4 font-semibold">Priority</th>
+                                <th className="px-6 py-4 font-semibold">Date</th>
+                                <th className="px-6 py-4 font-semibold text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50">
+                            {tickets.map((ticket) => (
+                                <tr key={ticket.id} className="hover:bg-gray-50 transition-colors">
+                                    <td className="px-6 py-4 font-mono text-gray-500 text-xs">{ticket.id}</td>
+                                    <td className="px-6 py-4">
+                                        <p className="font-medium text-gray-900">{ticket.user}</p>
+                                        <p className="text-xs text-gray-500">{ticket.email}</p>
+                                    </td>
+                                    <td className="px-6 py-4 text-gray-700">{ticket.subject}</td>
+                                    <td className="px-6 py-4">
+                                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold flex items-center w-fit ${
+                                            ticket.status === 'Open' ? 'bg-amber-100 text-amber-700' :
+                                            ticket.status === 'Pending' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+                                        }`}>
+                                            {ticket.status === 'Open' && <AlertCircle className="w-3 h-3 mr-1" />}
+                                            {ticket.status === 'Pending' && <Clock className="w-3 h-3 mr-1" />}
+                                            {ticket.status === 'Closed' && <CheckCircle className="w-3 h-3 mr-1" />}
+                                            {ticket.status}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span className={`text-xs font-medium ${
+                                            ticket.priority === 'High' ? 'text-red-600' :
+                                            ticket.priority === 'Medium' ? 'text-amber-600' : 'text-green-600'
+                                        }`}>
+                                            {ticket.priority}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 text-gray-500 text-xs">{ticket.date}</td>
+                                    <td className="px-6 py-4 text-right">
+                                        {ticket.status !== 'Closed' && (
+                                            <button 
+                                                onClick={() => setSelectedTicket(ticket)}
+                                                className="text-indigo-600 hover:text-indigo-800 text-xs font-bold bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors"
+                                            >
+                                                Resolve
+                                            </button>
+                                        )}
+                                        {ticket.status === 'Closed' && (
+                                            <span className="text-xs text-gray-400 font-medium">Archived</span>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const Support = () => {
     const { user } = useAuth();
     const [subject, setSubject] = useState('');
@@ -31,6 +178,7 @@ const Support = () => {
     
     const [showUpgrade, setShowUpgrade] = useState(false);
     const isIndividual = user?.userType === 'Individual';
+    const isAdmin = user?.role === 'admin';
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -43,6 +191,18 @@ const Support = () => {
             alert('Ticket created successfully! We will contact you shortly.');
         }, 1500);
     };
+
+    if (isAdmin) {
+        return (
+            <div className="space-y-8">
+                <div className="flex flex-col">
+                    <h1 className="text-2xl font-bold text-gray-900">Admin Support Control</h1>
+                    <p className="text-gray-500 text-sm mt-1">Manage, reply to, and resolve user support tickets.</p>
+                </div>
+                <AdminTicketView />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8">

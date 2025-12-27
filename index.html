@@ -31,52 +31,66 @@
       /* Shepherd Tour Custom Styles */
       .shepherd-element {
         background: #fff;
-        border-radius: 12px;
+        border-radius: 16px;
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         border: 1px solid #e2e8f0;
         z-index: 9999;
+        max-width: 400px;
+        font-family: 'Inter', sans-serif;
       }
-      .shepherd-header {
+      .shepherd-has-title .shepherd-content .shepherd-header {
         background: #f8fafc;
-        border-bottom: 1px solid #e2e8f0;
-        border-radius: 12px 12px 0 0;
-        padding: 12px 16px;
+        padding: 16px 20px;
+        border-radius: 16px 16px 0 0;
+        border-bottom: 1px solid #f1f5f9;
       }
       .shepherd-title {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #0f172a;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1e293b;
       }
       .shepherd-text {
         color: #475569;
-        font-size: 0.875rem;
-        line-height: 1.5;
-        padding: 16px;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        padding: 20px;
       }
       .shepherd-footer {
-        padding: 0 16px 16px 16px;
+        padding: 0 20px 20px 20px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
       }
       .shepherd-button {
         background: #4f46e5;
         color: white;
-        border-radius: 6px;
+        border-radius: 8px;
         padding: 8px 16px;
-        font-weight: 500;
+        font-weight: 600;
         font-size: 0.875rem;
         transition: all 0.2s;
         cursor: pointer;
+        border: none;
       }
       .shepherd-button:hover {
         background: #4338ca;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
       }
       .shepherd-button-secondary {
-        background: #f1f5f9;
-        color: #475569;
+        background: white;
+        color: #64748b;
+        border: 1px solid #e2e8f0;
         cursor: pointer;
       }
       .shepherd-button-secondary:hover {
-        background: #e2e8f0;
+        background: #f8fafc;
         color: #1e293b;
+        border-color: #cbd5e1;
+      }
+      /* Hide default arrow if preferred, or style it */
+      .shepherd-arrow, .shepherd-arrow:before {
+        display: none; 
       }
     </style>
   <script type="importmap">

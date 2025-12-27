@@ -7,7 +7,7 @@ import ITC from './pages/ITC';
 import Sales from './pages/Sales';
 import Compliance from './pages/Compliance';
 import GSTConnect from './pages/GSTConnect';
-import { Customers, AdminSubscriptions } from './pages/Admin';
+import { Customers, AdminSubscriptions, AdminOverview, SystemLogs } from './pages/Admin';
 import Subscription from './pages/Subscription';
 import Settings from './pages/Settings';
 import Legal from './pages/Legal';
@@ -25,7 +25,7 @@ const ProtectedRoute = ({ allowedRoles }: { allowedRoles?: ('admin' | 'user')[] 
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
     // Redirect to their respective home page if role not allowed
-    return <Navigate to={user.role === 'admin' ? '/admin/customers' : '/dashboard/overview'} replace />;
+    return <Navigate to={user.role === 'admin' ? '/admin/overview' : '/dashboard/overview'} replace />;
   }
 
   return (
@@ -58,9 +58,11 @@ function App() {
 
         {/* Admin Routes */}
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-           <Route path="/admin" element={<Navigate to="/admin/customers" replace />} />
+           <Route path="/admin" element={<Navigate to="/admin/overview" replace />} />
+           <Route path="/admin/overview" element={<AdminOverview />} />
            <Route path="/admin/customers" element={<Customers />} />
            <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
+           <Route path="/admin/logs" element={<SystemLogs />} />
         </Route>
 
         {/* Shared Routes (Accessible by both if authenticated) */}
