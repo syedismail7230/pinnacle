@@ -25,7 +25,8 @@ const commonAxisProps = {
 
 const commonTooltipProps = {
     cursor: { fill: 'transparent' },
-    contentStyle: { borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }
+    contentStyle: { backgroundColor: '#ffffff', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' },
+    wrapperStyle: { outline: 'none', zIndex: 100 }
 };
 
 const commonLegendProps = {

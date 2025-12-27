@@ -219,7 +219,7 @@ const Overview = () => {
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" id="overview-charts-section">
-        <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm relative overflow-hidden">
+        <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm relative">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
               <h2 className="text-lg font-bold text-gray-900 flex items-center">
                 <span className="w-1 h-6 bg-indigo-500 rounded-full mr-3"></span>
@@ -234,11 +234,11 @@ const Overview = () => {
         </div>
 
         {/* Locked Feature Example: Liability vs ITC Chart for Individuals */}
-        <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm relative overflow-hidden group">
+        <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm relative group">
           
           {/* Lock Overlay for Individuals */}
           {isIndividual && (
-              <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 flex flex-col items-center justify-center p-6 text-center">
+              <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 flex flex-col items-center justify-center p-6 text-center rounded-2xl">
                   <div className="bg-white p-4 rounded-full shadow-lg mb-4">
                       <Lock className="w-6 h-6 text-indigo-600" />
                   </div>
